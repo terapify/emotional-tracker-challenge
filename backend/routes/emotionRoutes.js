@@ -4,7 +4,7 @@ const {
   getEmotionById, 
   createEmotion, 
   updateEmotion,
-  getEmotionSummary
+  getEmotionSummary,
 } = require('../controllers/emotionController');
 const { protect } = require('../middlewares/authMiddleware');
 
