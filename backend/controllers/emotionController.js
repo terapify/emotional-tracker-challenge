@@ -1,5 +1,5 @@
 const Emotion = require('../models/emotionModel');
-
+const mongoose = require('mongoose');
 // Get all emotions for a user
 const getEmotions = async (req, res) => {
   const emotions = await Emotion.find({ user: req.user._id, date: { $lte: new Date() } }).sort({ date: -1 });
@@ -54,74 +54,68 @@ const updateEmotion = async (req, res) => {
 const getEmotionSummary = async (req, res) => {
   try {
     const userId = req.user._id;
+    const userObjectId = mongoose.isValidObjectId(userId) ? mongoose.Types.ObjectId(userId) : userId;
     
-    const summaryData = await Emotion.aggregate([
-      { $match: { user: userId } },
+    const summary = await Emotion.aggregate([
+      { $match: { user: userObjectId } },
       
-      { $group: {
-          _id: null,
-          count: { $sum: 1 },
-          totalIntensity: { $sum: "$intensity" },
-          emotions: { $push: "$emotion" }
-        }
-      },
+      { $facet: {
+        overall: [
+          { $group: {
+              _id: null,
+              count: { $sum: 1 },
+              totalIntensity: { $sum: "$intensity" }
+            }
+          },
+          { $project: {
+              _id: 0,
+              count: 1,
+              averageIntensity: { $cond: [{ $eq: ["$count", 0] }, 0, { $divide: ["$totalIntensity", "$count"] }] }
+            }
+          }
+        ],
+        
+        emotionCounts: [
+          { $group: {
+              _id: "$emotion",
+              count: { $sum: 1 }
+            }
+          }
+        ]
+      }},
       
       { $project: {
-          _id: 0,
-          count: 1,
-          averageIntensity: { $cond: [{ $eq: ["$count", 0] }, 0, { $divide: ["$totalIntensity", "$count"] }] }
-        }
-      }
+        count: { $arrayElemAt: ["$overall.count", 0] },
+        averageIntensity: { $arrayElemAt: ["$overall.averageIntensity", 0] },
+        emotions: {
+          $map: {
+            input: "$emotionCounts",
+            as: "emotion",
+            in: {
+              name: "$$emotion._id",
+              count: "$$emotion.count"
+            }
+          }
+        },
+      }}
     ]);
     
-    const emotionCounts = await Emotion.aggregate([
-      { $match: { user: userId } },
-      { $group: {
-          _id: "$emotion",
-          count: { $sum: 1 }
-        }
-      }
-    ]);
+    const result = summary.length > 0 ? summary[0] : { 
+      count: 0, 
+      averageIntensity: 0,
+      emotionCounts: {}
+    };
     
-    const summary = summaryData.length > 0 ? summaryData[0] : { count: 0, averageIntensity: 0 };
-    
-    summary.emotionCounts = {};
-    emotionCounts.forEach(item => {
-      summary.emotionCounts[item._id] = item.count;
-    });
-    
-    res.json(summary);
+    res.json(result);
   } catch (error) {
     res.status(500).json({ message: 'Error generating emotion summary', error: error.message });
   }
 };
 
-// const getEmotionSummary = async (userId) => {
-//   // Inefficient query
-//   const emotions = await Emotion.find({ user: userId });
-  
-//   // TODO: Implement aggregation for better performance
-//   const summary = {
-//     count: emotions.length,
-//     averageIntensity: 0,
-//     emotionCounts: {}
-//   };
-  
-//   emotions.forEach(e => {
-//     summary.averageIntensity += e.intensity;
-//     summary.emotionCounts[e.emotion] = (summary.emotionCounts[e.emotion] || 0) + 1;
-//   });
-  
-//   if (emotions.length > 0) {
-//     summary.averageIntensity /= emotions.length;
-//   }
-  
-//   return summary;
-// };
-
 module.exports = {
   getEmotions,
   getEmotionById,
   createEmotion,
-  updateEmotion
+  updateEmotion,
+  getEmotionSummary
 };

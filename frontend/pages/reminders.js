@@ -1,10 +1,10 @@
 import { useRouter } from "next/router";
-import { useEffect, useContext } from "react";
+import { useContext, useEffect } from "react";
 import styled from "styled-components";
 import Layout from "../components/Layout";
-import { AuthContext } from "../context/AuthContext";
 import ReminderForm from "../components/reminders/ReminderForm";
 import RemindersList from "../components/reminders/RemindersList";
+import { AuthContext } from "../context/AuthContext";
 
 const Title = styled.h1`
   color: #2c3e50;

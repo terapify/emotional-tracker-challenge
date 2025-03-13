@@ -9,10 +9,9 @@ export const EmotionContext = createContext();
 
 export const EmotionProvider = ({ children }) => {
   const [emotions, setEmotions] = useState([]);
+  const [emotionsSummary, setEmotionsSummary] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Get all emotions (client-side only, not using getServerSideProps)
-  // TODO: Implement server-side fetching
   const getEmotions = async (serverToken) => {
     try {
       setLoading(true);
@@ -41,7 +40,6 @@ export const EmotionProvider = ({ children }) => {
     }
   };
 
-  // Add a new emotion entry (frontend only, not connected to backend)
   const addEmotion = async (emotionData) => {
     try {
       const token = Cookie.get("token");
@@ -67,6 +65,24 @@ export const EmotionProvider = ({ children }) => {
     console.log("Sharing emotions with therapist:", emotionIds);
   };
 
+  const getEmotionsSummary = async () => {
+    try { 
+      const token = Cookie.get("token");
+      if (!token) {
+        return;
+      }
+      const res = await axios.get(`${API_URL}/emotions/summary`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Emotion summary:", res.data);
+      setEmotionsSummary(res.data);
+    } catch (error) {
+      console.error("Error getting emotion summary");
+    }
+  };
+
   return (
     <EmotionContext.Provider
       value={{
@@ -75,6 +91,8 @@ export const EmotionProvider = ({ children }) => {
         getEmotions,
         addEmotion,
         shareWithTherapist,
+        getEmotionsSummary,
+        emotionsSummary,
       }}
     >
       {children}

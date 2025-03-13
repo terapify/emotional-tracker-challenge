@@ -117,8 +117,8 @@ export default function Dashboard() {
             <CardText>
               Comparte tus datos de seguimiento emocional con tu terapeuta.
             </CardText>
-            <CardLink>
-              Próximamente
+            <CardLink onClick={() => router.push('/summary')}>
+              Ver tu resumen de emociones
             </CardLink>
           </Card>
         </Grid>
