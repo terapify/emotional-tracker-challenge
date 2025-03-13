@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import styled from 'styled-components';
-import { EmotionContext } from '../context/EmotionContext';
+import { EmotionContext } from '../../context/EmotionContext';
 
 const TrackerContainer = styled.div`
   background-color: white;

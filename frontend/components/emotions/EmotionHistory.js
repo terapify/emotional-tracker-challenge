@@ -1,6 +1,6 @@
 import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { EmotionContext } from '../context/EmotionContext';
+import { EmotionContext } from '../../context/EmotionContext';
 
 const HistoryContainer = styled.div`
   background-color: white;

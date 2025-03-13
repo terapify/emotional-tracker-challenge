@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const emotionRoutes = require('./routes/emotionRoutes');
-
+const reminderRoutes = require('./routes/reminderRoutes');
 const app = express();
 
 // Middleware
@@ -23,6 +23,7 @@ mongoose.connect(MONGO_URI, {
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/emotions', emotionRoutes);
+app.use('/api/reminders', reminderRoutes);
 
 // Unprotected test route
 app.get('/api/status', (req, res) => {

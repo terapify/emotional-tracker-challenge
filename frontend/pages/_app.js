@@ -1,6 +1,5 @@
 import { createGlobalStyle, ThemeProvider } from 'styled-components';
-import { AuthProvider } from '../context/AuthContext';
-import { EmotionProvider } from '../context/EmotionContext';
+import AppProviders from './AppProviders';
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap');
@@ -38,13 +37,12 @@ const theme = {
 function MyApp({ Component, pageProps }) {
   return (
     <>
+      
       <GlobalStyle />
       <ThemeProvider theme={theme}>
-        <AuthProvider>
-          <EmotionProvider>
-            <Component {...pageProps} />
-          </EmotionProvider>
-        </AuthProvider>
+        <AppProviders>
+          <Component {...pageProps} />
+        </AppProviders>
       </ThemeProvider>
     </>
   );

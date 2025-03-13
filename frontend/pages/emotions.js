@@ -2,8 +2,8 @@ import { useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import styled from 'styled-components';
 import Layout from '../components/Layout';
-import EmotionTracker from '../components/EmotionTracker';
-import EmotionHistory from '../components/EmotionHistory';
+import EmotionTracker from '../components/emotions/EmotionTracker';
+import EmotionHistory from '../components/emotions/EmotionHistory';
 import { AuthContext } from '../context/AuthContext';
 
 const EmotionsContainer = styled.div`
