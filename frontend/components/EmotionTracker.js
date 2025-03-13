@@ -93,9 +93,27 @@ const EmotionTracker = () => {
     setForm({ ...form, [name]: value });
   };
   
+  const validateForm = () => {
+    if (!form.emotion || !form.notes) {
+      return false;
+    }
+    
+    if (!form.intensity || form.intensity < 1 || form.intensity > 10) {
+      return false;
+    }
+    
+    return true;
+  };
+  
+  const isFormValid = validateForm();
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    if(!isFormValid) {
+      alert('Por favor, complete todos los campos.');
+      return;
+    }
+
     addEmotion({
       emotion: form.emotion,
       intensity: Number(form.intensity),

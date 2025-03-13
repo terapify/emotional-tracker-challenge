@@ -2,7 +2,7 @@ const Emotion = require('../models/emotionModel');
 
 // Get all emotions for a user
 const getEmotions = async (req, res) => {
-  const emotions = await Emotion.find({ user: req.user._id });
+  const emotions = await Emotion.find({ user: req.user._id, date: { $lte: new Date() } }).sort({ date: -1 });
   res.json(emotions);
 };
 
@@ -51,28 +51,73 @@ const updateEmotion = async (req, res) => {
   res.json(updatedEmotion);
 };
 
-const getEmotionSummary = async (userId) => {
-  // Inefficient query
-  const emotions = await Emotion.find({ user: userId });
-  
-  // TODO: Implement aggregation for better performance
-  const summary = {
-    count: emotions.length,
-    averageIntensity: 0,
-    emotionCounts: {}
-  };
-  
-  emotions.forEach(e => {
-    summary.averageIntensity += e.intensity;
-    summary.emotionCounts[e.emotion] = (summary.emotionCounts[e.emotion] || 0) + 1;
-  });
-  
-  if (emotions.length > 0) {
-    summary.averageIntensity /= emotions.length;
+const getEmotionSummary = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    
+    const summaryData = await Emotion.aggregate([
+      { $match: { user: userId } },
+      
+      { $group: {
+          _id: null,
+          count: { $sum: 1 },
+          totalIntensity: { $sum: "$intensity" },
+          emotions: { $push: "$emotion" }
+        }
+      },
+      
+      { $project: {
+          _id: 0,
+          count: 1,
+          averageIntensity: { $cond: [{ $eq: ["$count", 0] }, 0, { $divide: ["$totalIntensity", "$count"] }] }
+        }
+      }
+    ]);
+    
+    const emotionCounts = await Emotion.aggregate([
+      { $match: { user: userId } },
+      { $group: {
+          _id: "$emotion",
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    
+    const summary = summaryData.length > 0 ? summaryData[0] : { count: 0, averageIntensity: 0 };
+    
+    summary.emotionCounts = {};
+    emotionCounts.forEach(item => {
+      summary.emotionCounts[item._id] = item.count;
+    });
+    
+    res.json(summary);
+  } catch (error) {
+    res.status(500).json({ message: 'Error generating emotion summary', error: error.message });
   }
-  
-  return summary;
 };
+
+// const getEmotionSummary = async (userId) => {
+//   // Inefficient query
+//   const emotions = await Emotion.find({ user: userId });
+  
+//   // TODO: Implement aggregation for better performance
+//   const summary = {
+//     count: emotions.length,
+//     averageIntensity: 0,
+//     emotionCounts: {}
+//   };
+  
+//   emotions.forEach(e => {
+//     summary.averageIntensity += e.intensity;
+//     summary.emotionCounts[e.emotion] = (summary.emotionCounts[e.emotion] || 0) + 1;
+//   });
+  
+//   if (emotions.length > 0) {
+//     summary.averageIntensity /= emotions.length;
+//   }
+  
+//   return summary;
+// };
 
 module.exports = {
   getEmotions,
