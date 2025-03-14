@@ -2,6 +2,7 @@ import { useContext, useEffect } from "react";
 import styled from "styled-components";
 import { EmotionContext } from "../../context/EmotionContext";
 import { useEmotionTranslation } from "../../utils/translationUtils";
+import { Button } from "../ui/Button";
 
 const HistoryContainer = styled.div`
   background-color: white;
@@ -81,23 +82,6 @@ const EmotionNotes = styled.p`
   color: #34495e;
 `;
 
-const ShareWithTherapistButton = styled.button`
-  background-color: white;
-  border: 1px solid #3cabdb;
-  color: #3cabdb;
-  border-radius: 4px;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  margin-bottom: 1rem;
-
-  &:hover {
-    background-color: #2980b9;
-    color: white;
-  }
-`;
-
 const HistoryHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -119,15 +103,16 @@ const EmotionHistory = () => {
 
   const { translateEmotion } = useEmotionTranslation();
 
+  const handleShareWithTherapist = () => {
+    alert("Compartir con mi terapeuta está en progreso, mantente atento a v2!");
+  };
+
   return (
     <HistoryContainer>
       <HistoryHeader>
         <Title>Historial de emociones</Title>
-        <ShareWithTherapistButton>
-          Compartir con mi terapeuta
-        </ShareWithTherapistButton>
+        <Button className="outline-button" onClick={handleShareWithTherapist}>Compartir con mi terapeuta</Button>
       </HistoryHeader>
-
 
       {loading ? (
         <p>Cargando...</p>

@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { EmotionContext } from "../../context/EmotionContext";
 import { useEmotionTranslation } from "../../utils/translationUtils";
 import { AuthContext } from "../../context/AuthContext";
+import { Button } from "../ui/Button";
 
 const EmotionResumeContainer = styled.div`
   background-color: white;
@@ -38,23 +39,6 @@ const EmptyState = styled.p`
   font-style: italic;
 `;
 
-const ShareWithTherapistButton = styled.button`
-  background-color: white;
-  border: 1px solid #3cabdb;
-  color: #3cabdb;
-  border-radius: 4px;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  margin-bottom: 1rem;
-
-  &:hover {
-    background-color: #2980b9;
-    color: white;
-  }
-`;
-
 const SummaryHeader = styled.div`
   display: flex;
   justify-content: space-between;
@@ -74,7 +58,7 @@ const EmotionResume = () => {
   }, []);
 
   const handleShareWithTherapist = () => {
-    console.log("Compartir con mi terapeuta");
+    alert("Compartir con mi terapeuta está en progreso, mantente atento a v2!");
   };
 
   return (
@@ -85,9 +69,9 @@ const EmotionResume = () => {
         !emotionsSummary.emotions ||
         emotionsSummary.emotions.length > 0 ||
         !user.hasTherapist ? (
-          <ShareWithTherapistButton onClick={handleShareWithTherapist}>
+          <Button className="outline-button" onClick={handleShareWithTherapist}>
             Compartir con mi terapeuta
-          </ShareWithTherapistButton>
+          </Button>
         ) : (
           ""
         )}

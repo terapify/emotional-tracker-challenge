@@ -7,11 +7,8 @@ const {
   deleteReminder,
 } = require("../controllers/reminderController");
 
-router.route("/")
-  .get(protect, getReminders)
-  .post(protect, addReminder);
+router.route("/").get(protect, getReminders).post(protect, addReminder);
 
-router.route("/:id")
-  .delete(protect, deleteReminder);
+router.route("/:id").delete(protect, deleteReminder);
 
 module.exports = router;

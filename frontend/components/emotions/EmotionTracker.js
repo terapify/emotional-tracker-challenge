@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { EmotionContext } from '../../context/EmotionContext';
+import { Button } from '../ui/Button';
 
 const TrackerContainer = styled.div`
   background-color: white;
@@ -62,21 +63,6 @@ const TextArea = styled.textarea`
   font-size: 1rem;
   resize: vertical;
   min-height: 100px;
-`;
-
-const Button = styled.button`
-  background-color: #3CABDB;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  
-  &:hover {
-    background-color: #2980b9;
-  }
 `;
 
 const EmotionTracker = () => {
