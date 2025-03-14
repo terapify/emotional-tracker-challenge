@@ -1,6 +1,8 @@
 import { createGlobalStyle, ThemeProvider } from 'styled-components';
 import { AuthProvider } from '../context/AuthContext';
 import { EmotionProvider } from '../context/EmotionContext';
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&display=swap');
@@ -42,6 +44,7 @@ function MyApp({ Component, pageProps }) {
       <ThemeProvider theme={theme}>
         <AuthProvider>
           <EmotionProvider>
+            <ToastContainer position="top-right" autoClose={3000} style={{ zIndex: 9999 }} />
             <Component {...pageProps} />
           </EmotionProvider>
         </AuthProvider>
