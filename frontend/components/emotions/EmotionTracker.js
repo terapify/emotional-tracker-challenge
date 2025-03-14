@@ -1,6 +1,7 @@
 import { useState, useContext } from 'react';
 import styled from 'styled-components';
-import { EmotionContext } from '../context/EmotionContext';
+import { EmotionContext } from '../../context/EmotionContext';
+import { Button } from '../ui/Button';
 
 const TrackerContainer = styled.div`
   background-color: white;
@@ -64,21 +65,6 @@ const TextArea = styled.textarea`
   min-height: 100px;
 `;
 
-const Button = styled.button`
-  background-color: #3CABDB;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  
-  &:hover {
-    background-color: #2980b9;
-  }
-`;
-
 const EmotionTracker = () => {
   const [form, setForm] = useState({
     emotion: 'neutral',
@@ -93,9 +79,27 @@ const EmotionTracker = () => {
     setForm({ ...form, [name]: value });
   };
   
+  const validateForm = () => {
+    if (!form.emotion || !form.notes) {
+      return false;
+    }
+    
+    if (!form.intensity || form.intensity < 1 || form.intensity > 10) {
+      return false;
+    }
+    
+    return true;
+  };
+  
+  const isFormValid = validateForm();
   const handleSubmit = (e) => {
     e.preventDefault();
     
+    if(!isFormValid) {
+      alert('Por favor, complete todos los campos.');
+      return;
+    }
+
     addEmotion({
       emotion: form.emotion,
       intensity: Number(form.intensity),

@@ -1,24 +1,21 @@
-const express = require('express');
-const { 
-  getEmotions, 
-  getEmotionById, 
-  createEmotion, 
-  updateEmotion 
-} = require('../controllers/emotionController');
-const { protect } = require('../middlewares/authMiddleware');
+const express = require("express");
+const {
+  getEmotions,
+  getEmotionById,
+  createEmotion,
+  updateEmotion,
+  getEmotionSummary,
+} = require("../controllers/emotionController");
+const { protect } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
 // Protected routes
-router.route('/')
-  .get(protect, getEmotions)
-  .post(protect, createEmotion);
+router.route("/").get(protect, getEmotions).post(protect, createEmotion);
 
-router.get('/:id', getEmotionById);
+router.get("/summary", protect, getEmotionSummary);
 
-router.put('/:id', protect, updateEmotion);
-
-// TODO: Add route for getting emotion summary
-// TODO: Add route for sharing data with therapists
+router.get("/:id", getEmotionById);
+router.put("/:id", protect, updateEmotion);
 
 module.exports = router;

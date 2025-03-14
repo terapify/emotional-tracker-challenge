@@ -1,6 +1,8 @@
-import { useContext, useEffect } from 'react';
-import styled from 'styled-components';
-import { EmotionContext } from '../context/EmotionContext';
+import { useContext, useEffect } from "react";
+import styled from "styled-components";
+import { EmotionContext } from "../../context/EmotionContext";
+import { useEmotionTranslation } from "../../utils/translationUtils";
+import { Button } from "../ui/Button";
 
 const HistoryContainer = styled.div`
   background-color: white;
@@ -43,12 +45,22 @@ const EmotionHeader = styled.div`
 const EmotionName = styled.span`
   font-weight: bold;
   text-transform: capitalize;
-  
-  &.happy { color: #27ae60; }
-  &.sad { color: #2980b9; }
-  &.angry { color: #c0392b; }
-  &.anxious { color: #f39c12; }
-  &.neutral { color: #7f8c8d; }
+
+  &.happy {
+    color: #27ae60;
+  }
+  &.sad {
+    color: #2980b9;
+  }
+  &.angry {
+    color: #c0392b;
+  }
+  &.anxious {
+    color: #f39c12;
+  }
+  &.neutral {
+    color: #7f8c8d;
+  }
 `;
 
 const EmotionDate = styled.span`
@@ -58,7 +70,7 @@ const EmotionDate = styled.span`
 
 const EmotionIntensity = styled.div`
   margin: 0.5rem 0;
-  
+
   span {
     font-size: 0.9rem;
     color: #7f8c8d;
@@ -70,6 +82,13 @@ const EmotionNotes = styled.p`
   color: #34495e;
 `;
 
+const HistoryHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+`;
+
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleString();
@@ -77,31 +96,31 @@ const formatDate = (dateString) => {
 
 const EmotionHistory = () => {
   const { emotions, loading, getEmotions } = useContext(EmotionContext);
-  
-  // Fetch emotions on component mount
+
   useEffect(() => {
     getEmotions();
   }, []);
-  
-  const translateEmotion = (emotion) => {
-    const translations = {
-      happy: "Feliz",
-      sad: "Triste",
-      angry: "Enojado",
-      anxious: "Ansioso",
-      neutral: "Neutral"
-    };
-    return translations[emotion] || emotion;
+
+  const { translateEmotion } = useEmotionTranslation();
+
+  const handleShareWithTherapist = () => {
+    alert("Compartir con mi terapeuta está en progreso, mantente atento a v2!");
   };
-  
+
   return (
     <HistoryContainer>
-      <Title>Historial de Emociones</Title>
-      
+      <HistoryHeader>
+        <Title>Historial de emociones</Title>
+        <Button className="outline-button" onClick={handleShareWithTherapist}>Compartir con mi terapeuta</Button>
+      </HistoryHeader>
+
       {loading ? (
         <p>Cargando...</p>
       ) : emotions.length === 0 ? (
-        <EmptyState>No hay emociones registradas aún. ¡Comienza a hacer seguimiento de tus emociones arriba!</EmptyState>
+        <EmptyState>
+          No hay emociones registradas aún. ¡Comienza a hacer seguimiento de tus
+          emociones arriba!
+        </EmptyState>
       ) : (
         <EmotionList>
           {emotions.map((emotion) => (
@@ -112,11 +131,11 @@ const EmotionHistory = () => {
                 </EmotionName>
                 <EmotionDate>{formatDate(emotion.date)}</EmotionDate>
               </EmotionHeader>
-              
+
               <EmotionIntensity>
                 Intensidad: <span>{emotion.intensity}/10</span>
               </EmotionIntensity>
-              
+
               {emotion.notes && <EmotionNotes>{emotion.notes}</EmotionNotes>}
             </EmotionCard>
           ))}

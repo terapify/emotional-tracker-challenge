@@ -41,6 +41,16 @@ userSchema.methods.matchPassword = function(enteredPassword) {
   return bcrypt.compareSync(enteredPassword, this.password);
 };
 
-// TODO: Add a method to sanitize user data before sending to client
+userSchema.methods.sanitize = () => {
+  return {
+    _id: this._id,
+    name: this.name,
+    email: this.email,
+    role: this.role,
+    phone: this.phone,
+    therapistId: this.therapistId,
+    createdAt: this.createdAt
+  };
+};
 
 module.exports = mongoose.model('User', userSchema);

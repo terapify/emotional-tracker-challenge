@@ -1,9 +1,8 @@
-import { useContext, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { useContext, useEffect } from 'react';
 import styled from 'styled-components';
+import EmotionResume from '../components/emotions/EmotionResume';
 import Layout from '../components/Layout';
-import EmotionTracker from '../components/emotions/EmotionTracker';
-import EmotionHistory from '../components/emotions/EmotionHistory';
 import { AuthContext } from '../context/AuthContext';
 
 const EmotionsContainer = styled.div`
@@ -16,7 +15,7 @@ const Title = styled.h1`
   color: #2c3e50;
 `;
 
-export default function Emotions() {
+const Summary = () => {
   const { user, loading } = useContext(AuthContext);
   const router = useRouter();
   
@@ -29,22 +28,22 @@ export default function Emotions() {
   
   if (loading || !user) {
     return (
-      <Layout title="Emociones - Terapia Emocional">
+      <Layout title="Resumen de emociones - Terapia Emocional">
         <p>Cargando...</p>
       </Layout>
     );
   }
   
   return (
-    <Layout title="Emociones - Terapia Emocional">
+    <Layout title="Resumen de emociones - Terapia Emocional">
       <EmotionsContainer>
-        <Title>Seguimiento Emocional</Title>
+        <Title>Resumen de emociones</Title>
         
-        <EmotionTracker />
-        <EmotionHistory />
+        <EmotionResume />
         
-        {/* TODO: Add functionality to share emotions with therapist */}
       </EmotionsContainer>
     </Layout>
   );
 }
+
+export default Summary;
