@@ -2,9 +2,10 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const Emotion = require('../models/emotionModel');
+const connectDB = require('../config/db');
 
 // Configuración de la conexión a MongoDB
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/emotionaltracker';
+connectDB();
 
 // Usuarios de prueba
 const users = [

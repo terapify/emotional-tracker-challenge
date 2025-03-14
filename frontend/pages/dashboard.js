@@ -107,8 +107,8 @@ export default function Dashboard() {
             <CardText>
               Configura recordatorios para actividades que mejoran tu salud mental.
             </CardText>
-            <CardLink>
-              Próximamente
+            <CardLink onClick={() => router.push('/reminders')}>
+              Ver Recordatorios
             </CardLink>
           </Card>
           
@@ -117,8 +117,8 @@ export default function Dashboard() {
             <CardText>
               Comparte tus datos de seguimiento emocional con tu terapeuta.
             </CardText>
-            <CardLink>
-              Próximamente
+            <CardLink onClick={() => router.push('/share')}>
+              Compartir Datos
             </CardLink>
           </Card>
         </Grid>

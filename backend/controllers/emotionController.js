@@ -1,82 +1,106 @@
 const Emotion = require('../models/emotionModel');
 
-// Get all emotions for a user
+
 const getEmotions = async (req, res) => {
-  const emotions = await Emotion.find({ user: req.user._id });
-  res.json(emotions);
+  try {
+    const emotions = await Emotion.find({ user: req.user._id });
+    res.json(emotions);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
-// Get single emotion by ID
 const getEmotionById = async (req, res) => {
-  const emotion = await Emotion.findById(req.params.id);
-  
-  if (!emotion) {
-    res.status(404).json({ message: 'Emotion not found' });
-    return;
+  try {
+    const emotion = await Emotion.findById(req.params.id);
+    if (!emotion) {
+      return res.status(404).json({ message: 'Emotion not found' });
+    }
+    res.json(emotion);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
   }
-
-  res.json(emotion);
 };
 
-// Create a new emotion entry
+
 const createEmotion = async (req, res) => {
-  const { emotion, intensity, notes } = req.body;
-
-  const newEmotion = await Emotion.create({
-    user: req.user._id,
-    emotion,
-    intensity,
-    notes
-  });
-
-  res.status(201).json(newEmotion);
+  try {
+    const { emotion, intensity, notes } = req.body;
+    const newEmotion = await Emotion.create({
+      user: req.user._id,
+      emotion,
+      intensity,
+      notes
+    });
+    res.status(201).json(newEmotion);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
 };
 
-// Update an emotion
+
 const updateEmotion = async (req, res) => {
-  const { emotion, intensity, notes } = req.body;
-
-  const emotionRecord = await Emotion.findById(req.params.id);
-
-  if (!emotionRecord) {
-    res.status(404).json({ message: 'Emotion not found' });
-    return;
+  try {
+    const { emotion, intensity, notes } = req.body;
+    const emotionRecord = await Emotion.findById(req.params.id);
+    if (!emotionRecord) {
+      return res.status(404).json({ message: 'Emotion not found' });
+    }
+    emotionRecord.emotion = emotion || emotionRecord.emotion;
+    emotionRecord.intensity = intensity || emotionRecord.intensity;
+    emotionRecord.notes = notes || emotionRecord.notes;
+    const updatedEmotion = await emotionRecord.save();
+    res.json(updatedEmotion);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
   }
-  
-  emotionRecord.emotion = emotion || emotionRecord.emotion;
-  emotionRecord.intensity = intensity || emotionRecord.intensity;
-  emotionRecord.notes = notes || emotionRecord.notes;
-
-  const updatedEmotion = await emotionRecord.save();
-  res.json(updatedEmotion);
 };
 
-const getEmotionSummary = async (userId) => {
-  // Inefficient query
-  const emotions = await Emotion.find({ user: userId });
-  
-  // TODO: Implement aggregation for better performance
-  const summary = {
-    count: emotions.length,
-    averageIntensity: 0,
-    emotionCounts: {}
-  };
-  
-  emotions.forEach(e => {
-    summary.averageIntensity += e.intensity;
-    summary.emotionCounts[e.emotion] = (summary.emotionCounts[e.emotion] || 0) + 1;
-  });
-  
-  if (emotions.length > 0) {
-    summary.averageIntensity /= emotions.length;
+
+const getEmotionSummary = async (req, res) => {
+  try {
+    const summary = await Emotion.aggregate([
+      { $match: { user: req.user._id } },
+      {
+        $group: {
+          _id: '$emotion',
+          count: { $sum: 1 },
+          totalIntensity: { $sum: '$intensity' }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          emotionCounts: { $push: { emotion: '$_id', count: '$count' } },
+          totalEmotions: { $sum: '$count' },
+          totalIntensity: { $sum: '$totalIntensity' }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          count: '$totalEmotions',
+          averageIntensity: {
+            $cond: [
+              { $eq: ['$totalEmotions', 0] },
+              0,
+              { $divide: ['$totalIntensity', '$totalEmotions'] }
+            ]
+          },
+          emotionCounts: 1
+        }
+      }
+    ]);
+    res.json(summary[0] || { count: 0, averageIntensity: 0, emotionCounts: [] });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
   }
-  
-  return summary;
 };
 
 module.exports = {
   getEmotions,
   getEmotionById,
   createEmotion,
-  updateEmotion
+  updateEmotion,
+  getEmotionSummary
 };

@@ -25,7 +25,7 @@ services:
     environment:
       - MONGO_URI=mongodb://mongodb:27017/emotionaltracker
       - JWT_SECRET=mysecretkey123
-      - SEED_DATABASE=false
+      - SEED_DATABASE=true
 
   mongodb:
     image: mongo:latest
